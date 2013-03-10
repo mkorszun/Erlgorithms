@@ -1,0 +1,1 @@
+Some of the most popular algorithms and data structures implemented in Erlang.
