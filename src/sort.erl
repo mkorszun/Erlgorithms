@@ -2,6 +2,7 @@
 
 -export([bubble_sort/1, bubble_sort/2]).
 -export([insertion_sort/1, insertion_sort/2]).
+-export([quick_sort/1, quick_sort/2]).
 
 %% ###############################################################
 %% Bubble sort
@@ -49,6 +50,20 @@ insert([H|T]=A, Element, Comparator) ->
     end.
 
 %% ###############################################################
+%% Quick sort
+%% ###############################################################
+
+quick_sort(Array) ->
+    quick_sort(Array, fun comp/2).
+
+quick_sort([], _) ->
+    [];
+quick_sort([P|Array], Comparator) ->
+    quick_sort([X || X <- Array, Comparator(X, P) == 1], Comparator)
+    ++ [P] ++
+    quick_sort([X || X <- Array, Comparator(X, P) == 0 orelse Comparator(X, P) == -1], Comparator).
+
+%% ###############################################################
 %% Internal functions
 %% ###############################################################
 
@@ -63,8 +78,8 @@ comp(E1, E2) when E1 < E2 -> 1.
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 
-methods(1) -> [fun bubble_sort/1, fun insertion_sort/1];
-methods(2) -> [fun bubble_sort/2, fun insertion_sort/2].
+methods(1) -> [fun bubble_sort/1, fun insertion_sort/1, fun quick_sort/1];
+methods(2) -> [fun bubble_sort/2, fun insertion_sort/2, fun quick_sort/2].
 
 sort_empty_test() ->
     lists:foreach(fun(M) -> ?assertEqual([], M([])) end, methods(1)).
