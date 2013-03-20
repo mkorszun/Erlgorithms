@@ -3,6 +3,7 @@
 -export([bubble_sort/1, bubble_sort/2]).
 -export([insertion_sort/1, insertion_sort/2]).
 -export([quick_sort/1, quick_sort/2]).
+-export([merge_sort/1, merge_sort/2]).
 
 %% ###############################################################
 %% Bubble sort
@@ -64,6 +65,32 @@ quick_sort([P|Array], Comparator) ->
     quick_sort([X || X <- Array, Comparator(X, P) == 0 orelse Comparator(X, P) == -1], Comparator).
 
 %% ###############################################################
+%% Merge sort
+%% ###############################################################
+
+merge_sort(Array) ->
+    merge_sort(Array, fun comp/2).
+
+merge_sort([], _) -> [];
+merge_sort([E], _) -> [E];
+merge_sort([E1, E2], C)-> merge([E1], [E2], C);
+merge_sort(Array, C) ->
+    P = (length(Array) div 2),
+    L = lists:sublist(Array, 1, P),
+    R = lists:sublist(Array, P + 1, length(Array)),
+    merge(merge_sort(L, C), merge_sort(R, C), C).
+
+%% ###############################################################
+
+merge(L1, [], _) when length(L1) > 0 -> L1;
+merge([], L2, _) when length(L2) > 0 -> L2;
+merge([H1|T1]=L1, [H2|T2]=L2, Comparator) ->
+    case Comparator(H1, H2) of
+        -1 -> [H2 | merge(L1, T2, Comparator)];
+        _ -> [H1 | merge(T1, L2, Comparator)]
+    end.
+
+%% ###############################################################
 %% Internal functions
 %% ###############################################################
 
@@ -78,8 +105,8 @@ comp(E1, E2) when E1 < E2 -> 1.
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 
-methods(1) -> [fun bubble_sort/1, fun insertion_sort/1, fun quick_sort/1];
-methods(2) -> [fun bubble_sort/2, fun insertion_sort/2, fun quick_sort/2].
+methods(1) -> [fun bubble_sort/1, fun insertion_sort/1, fun quick_sort/1, fun merge_sort/1];
+methods(2) -> [fun bubble_sort/2, fun insertion_sort/2, fun quick_sort/2, fun merge_sort/2].
 
 sort_empty_test() ->
     lists:foreach(fun(M) -> ?assertEqual([], M([])) end, methods(1)).
